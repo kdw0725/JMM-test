@@ -1,6 +1,7 @@
 import urllib.request
 import requests
 from bs4 import BeautifulSoup
+import json
 
 
 def loc():
@@ -21,7 +22,6 @@ def loc():
     if (rescode == 200):
         response_body = response.read()
         print(response_body.decode('utf-8'))
-
     else:
         print("Error Code:" + response)
 
@@ -42,7 +42,8 @@ def getGPS():
     if (rescode == 200):
         response_body = response.read()
         locinfo = response_body.decode('utf-8')
-        print(locinfo)
+        for item in locinfo.items():
+            print(item)
     else:
         print("Error Code:" + response)
 def find_info(search_url):
@@ -50,9 +51,9 @@ def find_info(search_url):
     res.raise_for_status()
     soup = BeautifulSoup(res.text, 'html.parser')
 
-    section_sname = soup.find("h2", {"class": "tit_location"})
-    section_pnum = soup.find("span", {"class": "txt_contact"})
-    section_addr = soup.find("span", {"class": "txt_address"})
+    section_sname = soup.find("h2", {"class" : "tit_location"})
+    section_pnum = soup.find("span", {"class" : "txt_contact"})
+    section_addr = soup.find("span", {"class" : "txt_address"})
 
     for name in section_sname:
         print(name)
@@ -76,25 +77,5 @@ def search_info():
                 if 'place' in link.attrs['href']:
                     find_info(link.attrs['href'])
 
-
-
-    '''page_url = 'https://store.naver.com/restaurants/detail?id=21542328'
-    res = requests.get(page_url)
-    res.raise_for_status()
-    soup = BeautifulSoup(res.text,'html.parser')
-
-    section_sname = soup.find("strong",{"class" : "name"})
-    section_pnum = soup.find("div",{"class" : "txt"})
-
-    section_addr = soup.find("span",{"class" : "addr"})
-
-    for name in section_sname:
-        print(name)
-    for pnum in section_pnum:
-        print(pnum)
-    for addr in section_addr:
-        print(addr)'''
-
-
 if __name__ == '__main__':
-    find_info('https://place.map.daum.net/8639484')
+    getGPS()
