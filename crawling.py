@@ -79,3 +79,4 @@ def search_info():
 
 if __name__ == '__main__':
     getGPS()
+    'http://zeroplus1.zc.bz/jh/web/main.php?id=132&category=ETC'
