@@ -38,12 +38,15 @@ def getGPS():
     response = urllib.request.urlopen(request)
     rescode = response.getcode()
 
-
     if (rescode == 200):
         response_body = response.read()
         locinfo = response_body.decode('utf-8')
-        for item in locinfo.items():
-            print(item)
+        json_data = json.loads(locinfo)
+        item = json_data.get('items')
+        posx = item[0].get('mapx')
+        posy = item[0].get('mapy')
+        print(location+"의 GSP 주소는 ("+posx+","+posy+")입니다.")
+
     else:
         print("Error Code:" + response)
 def find_info(search_url):
@@ -79,4 +82,4 @@ def search_info():
 
 if __name__ == '__main__':
     getGPS()
-    'http://zeroplus1.zc.bz/jh/web/main.php?id=132&category=ETC'
+    'https://github.com/wan2land/python-geo-converter/blob/master/GeoConverter.py'
