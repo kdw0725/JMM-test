@@ -2,30 +2,24 @@ import urllib.request
 import requests
 from bs4 import BeautifulSoup
 import json
+import datetime
+import re
+
+def menuCraw():
+    dt = datetime.datetime.now()
+    today_week = dt.weekday()
+    url = 'http://skhu.ac.kr/uni_zelkova/uni_zelkova_4_3_view.aspx?idx=349&curpage=1'
+    res = requests.get(url)
+    res.raise_for_status()
+    soup = BeautifulSoup(res.text, 'html.parser')
+    lunch_menu = soup.find_all("td", {"class" : "color606"})
+    a = lunch_menu[today_week]
+    b = str(a).split('<br/>')
+
+    print(b)
 
 
-def loc():
-    client_id = "fechS4lsKMLVwarW0I01"
-    client_secret = "MxwdD119Rv"
-
-    location = input("현재 위치를 알려주세요 : ")
-    encText = urllib.parse.quote(location)
-
-    url = 'https://search.naver.com/search.naver?sm=tab_hty.top&where=nexearch&query=' +encText+'&oquery='+encText+'&tqi=TItWDspVuEKssvZQOZZssssstq4-315036'
-
-    request = urllib.request.Request(url)
-    request.add_header("X-Naver-Client-Id", client_id)
-    request.add_header("X-Naver-Client-Secret", client_secret)
-    response = urllib.request.urlopen(request)
-    rescode = response.getcode()
-
-    if (rescode == 200):
-        response_body = response.read()
-        print(response_body.decode('utf-8'))
-    else:
-        print("Error Code:" + response)
-
-def getGPS():
+def userGPS():
     client_id = "fechS4lsKMLVwarW0I01"
     client_secret = "MxwdD119Rv"
     location = input("현재 위치를 말씀해 주세요 : ")
@@ -49,37 +43,39 @@ def getGPS():
 
     else:
         print("Error Code:" + response)
-def find_info(search_url):
-    res = requests.get(search_url)
-    res.raise_for_status()
-    soup = BeautifulSoup(res.text, 'html.parser')
 
-    section_sname = soup.find("h2", {"class" : "tit_location"})
-    section_pnum = soup.find("span", {"class" : "txt_contact"})
-    section_addr = soup.find("span", {"class" : "txt_address"})
-
-    for name in section_sname:
-        print(name)
-    for pnum in section_pnum:
-        print(pnum)
-    for addr in section_addr:
-        print(addr)
-
-
-def search_info():
-    location = input("맛집 이름 입력 : ")
+def storeInfo():
+    client_id = "fechS4lsKMLVwarW0I01"
+    client_secret = "MxwdD119Rv"
+    location = input("가게 이름 : ")
     encText = urllib.parse.quote(location)
-    search_url = 'https://search.daum.net/search?w=tot&DA=YZR&t__nil_searchbox=btn&sug=&sugo=&q='+encText
 
-    html = requests.get(search_url).text
-    soup = BeautifulSoup(html,'html.parser')
-    maps = soup.findAll('div',{'class':"wrap_place"})
-    for b in maps:
-        for link in b.findAll('a'):
-            if 'href' in link.attrs:
-                if 'place' in link.attrs['href']:
-                    find_info(link.attrs['href'])
+    store_url = 'https://openapi.naver.com/v1/search/local?query='+encText
+    request = urllib.request.Request(store_url)
+    request.add_header("X-Naver-Client-Id", client_id)
+    request.add_header("X-Naver-Client-Secret", client_secret)
+    response = urllib.request.urlopen(request)
+    rescode = response.getcode()
+
+    if(rescode ==200):
+        response_body = response.read()
+        locinfo = response_body.decode('utf-8')
+
+        json_data = json.loads(locinfo)
+        item = json_data.get('items')
+
+        s_title = item[0].get('title')
+        s_telephone = item[0].get('telephone')
+        s_address = item[0].get('address')
+        s_roadAddress = item[0].get('roadAddress')
+        s_mapx = item[0].get('mapx')
+        s_mapy = item[0].get('mapy')
+        store_information = [s_title, s_telephone, s_address, s_roadAddress, s_mapy, s_mapx]
+        for i in store_information:
+            print(i)
+    else:
+        print("Error Code:"+response)
 
 if __name__ == '__main__':
-    getGPS()
-    'https://github.com/wan2land/python-geo-converter/blob/master/GeoConverter.py'
+    storeInfo()
+    'https://github.com/s-owl/skhufeeds/blob/master/skhufeeds/crawlers/crawlers/menu.py'
